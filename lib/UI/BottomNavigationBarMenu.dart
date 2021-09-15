@@ -7,17 +7,17 @@ import 'package:news_app/UI/SearchScreen.dart';
 import 'package:news_app/UI/TopHeadlinesScreen.dart';
 
 class BottomNavigationBarMenu extends StatefulWidget {
-  final int index;
+  final int? index;
 
-  const BottomNavigationBarMenu({Key key, this.index}) : super(key: key);
+  const BottomNavigationBarMenu({this.index});
 
   @override
   BottomNavigationBarMenuState createState() => BottomNavigationBarMenuState();
 }
 
 class BottomNavigationBarMenuState extends State<BottomNavigationBarMenu> {
-  int _selectedIndex;
-  double width, height;
+  int? _selectedIndex;
+  double? width, height;
 
   @override
   void initState() {
@@ -32,38 +32,36 @@ class BottomNavigationBarMenuState extends State<BottomNavigationBarMenu> {
     });
   }
 
-  Future<bool> comfirmExitFromUser() {
+  comfirmExitFromUser() {
     return showDialog(
-          barrierDismissible: false,
-          context: context,
-          builder: (context) => new AlertDialog(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10.0))),
-            title: new Text(
-              'Confirm',
-            ),
-            content: new Text('Do you want to exit this app ?'),
-            actions: <Widget>[
-              new FlatButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: new Text('Cancel',
-                    style: boldTxtStyle.copyWith(fontSize: 18)),
-              ),
-              new FlatButton(
-                textColor: Colors.red,
-                onPressed: () {
-                  Navigator.pop(context);
-                  exit(0);
-                },
-                child: new Text(
-                  'Exit',
-                  style: boldTxtStyle.copyWith(color: Colors.red, fontSize: 20),
-                ),
-              ),
-            ],
+      barrierDismissible: false,
+      context: context,
+      builder: (context) => new AlertDialog(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10.0))),
+        title: new Text(
+          'Confirm',
+        ),
+        content: new Text('Do you want to exit this app ?'),
+        actions: <Widget>[
+          new TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child:
+                new Text('Cancel', style: boldTxtStyle.copyWith(fontSize: 18)),
           ),
-        ) ??
-        false;
+          new TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              exit(0);
+            },
+            child: new Text(
+              'Exit',
+              style: boldTxtStyle.copyWith(color: Colors.red, fontSize: 20),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -71,7 +69,7 @@ class BottomNavigationBarMenuState extends State<BottomNavigationBarMenu> {
     return WillPopScope(
       child: SafeArea(
           child: Scaffold(
-        body: widgets[_selectedIndex],
+        body: widgets[_selectedIndex!],
         bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           items: const <BottomNavigationBarItem>[
@@ -84,12 +82,12 @@ class BottomNavigationBarMenuState extends State<BottomNavigationBarMenu> {
               label: 'Search',
             )
           ],
-          currentIndex: _selectedIndex,
+          currentIndex: _selectedIndex!,
           selectedItemColor: BLUE_TEXT_COLOR,
           onTap: _onItemTapped,
         ),
       )),
-      onWillPop: () {
+      onWillPop: () async {
         if (_selectedIndex != 1) {
           setState(() {
             _selectedIndex = 1;
@@ -97,6 +95,7 @@ class BottomNavigationBarMenuState extends State<BottomNavigationBarMenu> {
         } else {
           comfirmExitFromUser();
         }
+        return false;
       },
     );
   }

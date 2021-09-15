@@ -2,27 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:news_app/Helpers/AppConstants.dart';
 
 class InputTextField extends StatelessWidget {
-  final bool isEnabled;
-  final bool autoFocus;
-  final String name;
-  final TextEditingController controller;
-  final Function(String) onValidate;
+  final bool? isEnabled;
+  final bool? autoFocus;
+  final String? name;
+  final TextEditingController? controller;
   final int maxLines;
-  final TextStyle hintStyle;
-  final InputBorder inputBorder;
-  final TextStyle labelStyle;
-  final TextStyle textStyle;
-  final Function(String) onChanged;
-  final EdgeInsetsGeometry contentPadding;
-  final Widget suffix;
-  final String errorText;
+  final TextStyle? hintStyle;
+  final InputBorder? inputBorder;
+  final TextStyle? labelStyle;
+  final TextStyle? textStyle;
+  final Function(String)? onChanged;
+  final EdgeInsetsGeometry? contentPadding;
+  final Widget? suffix;
+  final String? errorText;
 
   const InputTextField({
     this.isEnabled = true,
     this.autoFocus = true,
     this.name,
     this.controller,
-    this.onValidate,
     this.maxLines = 1,
     this.hintStyle,
     this.inputBorder,
@@ -43,9 +41,8 @@ class InputTextField extends StatelessWidget {
       ),
       child: TextFormField(
         enabled: isEnabled,
-        autofocus: autoFocus,
+        autofocus: autoFocus!,
         controller: controller,
-        validator: onValidate,
         onChanged: onChanged,
         style: textStyle ?? regularTxtStyle,
         decoration: InputDecoration(

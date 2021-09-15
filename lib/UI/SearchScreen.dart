@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -17,20 +18,20 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   TextEditingController searchTxtCotroller = TextEditingController();
-  Articles articles;
-  List<Article> articleList = [];
-  Timer _timer;
-  String previousKeyword;
-  bool _isDialogShowing;
+  Articles? articles;
+  List<ArticlesData>? articleList = [];
+  Timer? _timer;
+  String? previousKeyword;
+  bool? _isDialogShowing;
 
-  void searchWithThrottle(String keyword, {int throttleTime}) {
+  void searchWithThrottle(String keyword, {int? throttleTime}) {
     _timer?.cancel();
     if (keyword != previousKeyword && keyword.isNotEmpty) {
       previousKeyword = keyword;
       _timer = Timer.periodic(Duration(milliseconds: throttleTime ?? 350),
           (timer) async {
         await getTopHeadlinesAPI(keyword);
-        _timer.cancel();
+        _timer!.cancel();
       });
     }
   }
@@ -47,7 +48,7 @@ class _SearchScreenState extends State<SearchScreen> {
       });
 
       if (response.statusCode != 200) {
-        if (_isDialogShowing) {
+        if (_isDialogShowing!) {
           setState(() {
             _isDialogShowing = false;
           });
@@ -58,13 +59,13 @@ class _SearchScreenState extends State<SearchScreen> {
       } else {
         setState(() {
           articles = Articles.fromJson(response.data);
-          articleList = articles.articles;
+          articleList = articles!.articles!.cast<ArticlesData>();
           _isDialogShowing = false;
         });
         return true;
       }
     } on DioError catch (e) {
-      if (_isDialogShowing) {
+      if (_isDialogShowing!) {
         setState(() {
           _isDialogShowing = false;
         });
@@ -93,7 +94,7 @@ class _SearchScreenState extends State<SearchScreen> {
             InkWell(
               onTap: () {
                 searchTxtCotroller.clear();
-                articleList.clear();
+                articleList!.clear();
               },
               child: Icon(
                 Icons.cancel_rounded,
@@ -107,7 +108,7 @@ class _SearchScreenState extends State<SearchScreen> {
             Text("Search Results"),
             Expanded(
               child: ListView.builder(
-                  itemCount: articleList.length,
+                  itemCount: articleList!.length,
                   shrinkWrap: true,
                   itemBuilder: (context, index) {
                     return Container(
@@ -141,18 +142,23 @@ class _SearchScreenState extends State<SearchScreen> {
                                       offset: Offset(0, 1),
                                     ),
                                   ],
-                                  image: DecorationImage(
-                                      fit: BoxFit.fill,
-                                      image: NetworkImage(
-                                          articleList[index].urlToImage)),
+                                  image: articleList![index].urlToImage != null
+                                      ? DecorationImage(
+                                          fit: BoxFit.fill,
+                                          image: NetworkImage(
+                                              articleList![index].urlToImage!))
+                                      : DecorationImage(
+                                          image:
+                                              AssetImage("assets/noImage.png"),
+                                          fit: BoxFit.cover),
                                 )),
                             SizedBox(height: 10),
-                            Text(articleList[index].title ?? "",
+                            Text(articleList?[index].title ?? "",
                                 style: medTxtStyleSemiBoldBlack.copyWith(
                                     fontSize: 16)),
                             SizedBox(height: 10),
                             Text(
-                              articleList[index].description ?? "",
+                              articleList?[index].description ?? "",
                               style: medTxtStyleSemiBoldBlack.copyWith(
                                   fontSize: 14, color: Colors.grey),
                               textAlign: TextAlign.justify,
@@ -163,13 +169,13 @@ class _SearchScreenState extends State<SearchScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Text(articleList[index].author ?? "",
+                                  Text(articleList?[index].author ?? "",
                                       style: medTxtStyleSemiBoldBlack.copyWith(
                                           fontSize: 12)),
                                   Text(
-                                      articleList[index].publishedAt != null
+                                      articleList?[index].publishedAt != null
                                           ? formatTime(
-                                              articleList[index].publishedAt)
+                                              articleList![index].publishedAt!)
                                           : "",
                                       style: medTxtStyleSemiBoldBlack.copyWith(
                                           fontSize: 12, color: Colors.grey)),

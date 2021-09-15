@@ -15,9 +15,9 @@ class TopHeadlinesScreen extends StatefulWidget {
 
 class _TopHeadlinesScreenState extends State<TopHeadlinesScreen> {
   bool _isDialogShowing = false;
-  Articles articles;
-  Future<List<Article>> refresh;
-  List<Article> articleList;
+  Articles? articles;
+  Future<List<ArticlesData>>? refresh;
+  List<ArticlesData>? articleList;
 
   @override
   void initState() {
@@ -26,8 +26,8 @@ class _TopHeadlinesScreenState extends State<TopHeadlinesScreen> {
     getTopHeadlinesAPI();
   }
 
-  Future<List<Article>> getTopHeadlines() async {
-    return articleList;
+  Future<List<ArticlesData>> getTopHeadlines() async {
+    return articleList!;
   }
 
   Future<bool> getTopHeadlinesAPI() async {
@@ -53,7 +53,7 @@ class _TopHeadlinesScreenState extends State<TopHeadlinesScreen> {
       } else {
         setState(() {
           articles = Articles.fromJson(response.data);
-          articleList = articles.articles;
+          articleList = articles!.articles!.cast<ArticlesData>();
           refresh = getTopHeadlines();
           _isDialogShowing = false;
         });
@@ -106,9 +106,10 @@ class _TopHeadlinesScreenState extends State<TopHeadlinesScreen> {
   }
 
   Widget buildNewsList() {
-    return FutureBuilder<List<Article>>(
+    return FutureBuilder<List<ArticlesData>>(
         future: refresh,
-        builder: (BuildContext context, AsyncSnapshot<List<Article>> snapshot) {
+        builder:
+            (BuildContext context, AsyncSnapshot<List<ArticlesData>> snapshot) {
           if (!snapshot.hasData) {
             return Center(
               child: Text(
@@ -118,7 +119,7 @@ class _TopHeadlinesScreenState extends State<TopHeadlinesScreen> {
             );
           }
           return ListView.builder(
-              itemCount: articleList.length,
+              itemCount: articleList!.length,
               shrinkWrap: true,
               itemBuilder: (context, index) {
                 return Container(
@@ -152,18 +153,22 @@ class _TopHeadlinesScreenState extends State<TopHeadlinesScreen> {
                                   offset: Offset(0, 1),
                                 ),
                               ],
-                              image: DecorationImage(
-                                  fit: BoxFit.fill,
-                                  image: NetworkImage(
-                                      articleList[index].urlToImage)),
+                              image: articleList![index].urlToImage != null
+                                  ? DecorationImage(
+                                      fit: BoxFit.fill,
+                                      image: NetworkImage(
+                                          articleList![index].urlToImage!))
+                                  : DecorationImage(
+                                      image: AssetImage("assets/noImage.png"),
+                                      fit: BoxFit.cover),
                             )),
                         SizedBox(height: 10),
-                        Text(articleList[index].title ?? "",
+                        Text(articleList?[index].title ?? "",
                             style: medTxtStyleSemiBoldBlack.copyWith(
                                 fontSize: 16)),
                         SizedBox(height: 10),
                         Text(
-                          articleList[index].description ?? "",
+                          articleList?[index].description ?? "",
                           style: medTxtStyleSemiBoldBlack.copyWith(
                               fontSize: 14, color: Colors.grey),
                           textAlign: TextAlign.justify,
@@ -173,13 +178,13 @@ class _TopHeadlinesScreenState extends State<TopHeadlinesScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Text(articleList[index].author ?? "",
+                              Text(articleList?[index].author ?? "",
                                   style: medTxtStyleSemiBoldBlack.copyWith(
                                       fontSize: 12)),
                               Text(
-                                  articleList[index].publishedAt != null
+                                  articleList![index].publishedAt != null
                                       ? formatTime(
-                                          articleList[index].publishedAt)
+                                          articleList![index].publishedAt!)
                                       : "",
                                   style: medTxtStyleSemiBoldBlack.copyWith(
                                       fontSize: 12, color: Colors.grey)),

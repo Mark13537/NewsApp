@@ -16,7 +16,7 @@ Dio getDio() {
   Dio dio = new Dio();
   dio.options.followRedirects = false;
   dio.options.validateStatus = (status) {
-    return status <= 500;
+    return status! <= 500;
   };
   dio.options.headers['Content-Type'] = 'application/json';
   dio.options.headers['Accept'] = 'application/json';
